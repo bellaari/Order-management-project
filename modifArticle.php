@@ -31,7 +31,7 @@ if(!empty($_POST) && !empty($_FILES)){
       if(in_array($extension, $extensions) && $size <= $maxSize && $error == 0){
         $uniqueName = uniqid('', true);
         //uniqid génère quelque chose comme ca : 5f586bf96dcd38.73540086
-        $file = $uniqueName.".".$extension;
+        $file = 'images/'.$uniqueName.".".$extension;
         //$file = 5f586bf96dcd38.73540086.jpg
 
         $query1 = "insert into image(nomimg,cheminimg,tailleimg,idarticle) values(:nom,:chemin,:taille,:id)";
@@ -39,7 +39,7 @@ if(!empty($_POST) && !empty($_FILES)){
         $pdostmt1->execute(["nom"=>$name,"chemin"=>$file,"taille"=>$size,"id"=>$_POST["myid"]]);
         $pdostmt1->closeCursor();
 
-        move_uploaded_file($tmpName, './images/'.$file);
+        move_uploaded_file($tmpName, './'.$file);
         
         header("Location:article.php");
       }else{
@@ -89,7 +89,7 @@ if(!empty($_GET["id"])){
         <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708z"/>
       </svg>
       </a>
-      <img src="images/<?php echo $row["cheminimg"] ?>" height="100" width="100"/>
+      <img src="<?php echo $row["cheminimg"] ?>" height="100" width="100"/>
     <?php endwhile; ?>
   </div>
 

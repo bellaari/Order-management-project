@@ -1,3 +1,5 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
 <?php
 $client = true;
 include_once("header.php");
@@ -12,7 +14,36 @@ if(!empty($_POST["inputnom"]) && !empty($_POST["inputville"]) && !empty($_POST["
         
 }
 
+$query2 = "SELECT departement_nom from departement order by departement_nom asc";
+$pdostmt2 = $pdo->prepare($query2);
+$pdostmt2->execute();
 ?>
+
+<script>
+  $(document).ready(function(){
+    $("#inputdepart").on("change",function(){
+
+      var depart_code = $('#inputdepart').val();
+
+      if(depart_code){
+
+        $.ajax({
+          type: "POST",
+          url: 'ajaxData.php',
+          data: 'depart_code='+depart_code,
+          success: function(response){
+            $('#inputville').html(response);
+            //alert(response);
+          }
+        });
+
+      }else{
+        $('#inputville').html("<option value=''>Selectioner d'abord un departement</option>");
+      }
+
+    });
+  })
+</script>
 
 <h1 class="mt-5">Ajouter un client</h1>
 
@@ -23,13 +54,29 @@ if(!empty($_POST["inputnom"]) && !empty($_POST["inputville"]) && !empty($_POST["
   </div>
 
   <div class="col-md-6">
-    <label for="inputville" class="form-label">Ville</label>
-    <input type="text" class="form-control" id="inputville" name="inputville" required>
-  </div>
-
-  <div class="col-12">
     <label for="inputtel" class="form-label">Telephone</label>
     <input type="tel" class="form-control" id="inputtel" name="inputtel" required>
+  </div>
+
+  <div class="col-md-6">
+    <label for="inputdepart" class="form-label">Departement</label>
+    <select type="text" class="form-control" id="inputdepart" name="inputdepart" required>
+      <option value="">Selectionner un departement</option>
+      <?php
+        foreach($pdostmt2->fetchAll(PDO::FETCH_ASSOC) as $tabvalues){
+            foreach($tabvalues as $tabelements){
+              echo "<option>".$tabelements."</option>";
+            }
+        }
+      ?>
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label for="inputville" class="form-label">Ville</label>
+    <select type="text" class="form-control" id="inputville" name="inputville" required>
+        <option value="">Selectionner d'abord un departement</option>
+    </select>
   </div>
 
   <div class="col-12">
