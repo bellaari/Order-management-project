@@ -5,40 +5,41 @@ $client = true;
 include_once("header.php");
 include_once("main.php");
 
+$query2 = "SELECT departement_nom from departement order by departement_nom asc";
+$pdostmt2 = $pdo->prepare($query2);
+$pdostmt2->execute();
+
 if(!empty($_POST["inputnom"]) && !empty($_POST["inputville"]) && !empty($_POST["inputtel"])){
     $query = "insert into client(nom,ville,telephone) values (:nom,:ville,:tel)";
     $pdostmt = $pdo->prepare($query);
     $pdostmt->execute(["nom"=>$_POST["inputnom"],"ville"=>$_POST["inputville"],"tel"=>$_POST["inputtel"]]);
     $pdostmt->closeCursor();
     header("Location:client.php");
-        
+
 }
 
-$query2 = "SELECT departement_nom from departement order by departement_nom asc";
-$pdostmt2 = $pdo->prepare($query2);
-$pdostmt2->execute();
 ?>
 
-<script>
+<script type="text/javascript">
   $(document).ready(function(){
     $("#inputdepart").on("change",function(){
 
-      var depart_code = $('#inputdepart').val();
+      var depart_code = $("#inputdepart").val();
 
       if(depart_code){
 
         $.ajax({
-          type: "POST",
+          type: 'POST',
           url: 'ajaxData.php',
           data: 'depart_code='+depart_code,
           success: function(response){
-            $('#inputville').html(response);
-            //alert(response);
+            $("#inputville").html(response);
+            // alert(response);
           }
         });
 
       }else{
-        $('#inputville').html("<option value=''>Selectioner d'abord un departement</option>");
+        $("#inputville").html("<option value=''> Selectioner d'abord un departement </option>");
       }
 
     });
@@ -63,11 +64,11 @@ $pdostmt2->execute();
     <select type="text" class="form-control" id="inputdepart" name="inputdepart" required>
       <option value="">Selectionner un departement</option>
       <?php
-        foreach($pdostmt2->fetchAll(PDO::FETCH_ASSOC) as $tabvalues){
-            foreach($tabvalues as $tabelements){
-              echo "<option>".$tabelements."</option>";
-            }
-        }
+        while($row = $pdostmt2->fetch(PDO::FETCH_ASSOC)):
+      ?>
+            <option value="<?php echo $row["departement_code "] ?>"> <?php echo $row["departement_nom"] ?> </option>";
+      <?php
+        endwhile;
       ?>
     </select>
   </div>
@@ -75,7 +76,7 @@ $pdostmt2->execute();
   <div class="col-md-6">
     <label for="inputville" class="form-label">Ville</label>
     <select type="text" class="form-control" id="inputville" name="inputville" required>
-        <option value="">Selectionner d'abord un departement</option>
+        <option>Selectioner d'abord un departement</option>
     </select>
   </div>
 
