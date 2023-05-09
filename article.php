@@ -1,4 +1,14 @@
 <?php
+// header("Access-Control-Allow-Origin: *");
+
+// // header("Content-Type: application/json; charset=UTF-8");
+
+// header("Access-Control-Allow-Methods: *");
+
+// header("Access-Control-Max-Age: 3600");
+
+// header("Access-Control-Allow-Headers: *");
+
 $article = true;
 
 include_once("header.php");
@@ -7,11 +17,11 @@ include_once("main.php");
 $count = 0;
 $list=[];
 
-$query = "SELECT idarticle FROM article WHERE idarticle IN (SELECT a.idarticle from article as a inner JOIN ligne_commande as lc on a.idarticle=lc.idarticle)
+$query1 = "SELECT idarticle FROM article WHERE idarticle IN (SELECT a.idarticle from article as a inner JOIN ligne_commande as lc on a.idarticle=lc.idarticle)
                                            OR idarticle IN (SELECT a.idarticle from article as a inner JOIN image as img on a.idarticle=img.idarticle)";
-$pdostmt = $pdo->prepare($query);
-$pdostmt->execute();
-foreach($pdostmt->fetchAll(PDO::FETCH_ASSOC) as $tabvalues) {
+$pdostmt1 = $pdo->prepare($query1);
+$pdostmt1->execute();
+foreach($pdostmt1->fetchAll(PDO::FETCH_ASSOC) as $tabvalues) {
     foreach($tabvalues as $tabelement){
         $list[] = $tabelement;
     }
@@ -32,6 +42,7 @@ foreach($pdostmt->fetchAll(PDO::FETCH_ASSOC) as $tabvalues) {
         $query = "select * from article";
         $pdostmt = $pdo->prepare($query);
         $pdostmt->execute();
+
     ?>
 
     <table id="myTable" class="display">
@@ -86,10 +97,16 @@ foreach($pdostmt->fetchAll(PDO::FETCH_ASSOC) as $tabvalues) {
                 </div>
 
         <?php endwhile;
-            $pdostmt->closeCursor();
+            // $pdostmt->closeCursor();
         ?>
         </tbody>
     </table>
+
+    <?php
+        // $pdostmt = $pdostmt->fetchAll(PDO::FETCH_ASSOC);
+        // json_encode($pdostmt);
+            
+    ?>
 
   </div>
 </main>

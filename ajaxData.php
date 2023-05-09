@@ -1,10 +1,13 @@
 <?php
 // $client = true;
+
 include_once("connexion.php");
 $pdo = new connect();
 // include_once("main.php");
 
     // $conn = mysqli_connect("localhost","root","","gestion_commande");
+
+session_start();
 
 $count = 0;
 $list=[];
@@ -130,12 +133,98 @@ if(!empty($_GET["updated_client"])){
             "data" => $pdostmt->errorInfo()
         ];
     }
-    
+
     echo json_encode($response);
 
 }
 
+if(!empty($_POST["username_register"]) && !empty($_POST["email_register"]) && !empty($_POST["password_register"])) {
 
+    $query2="select username from user where username=:user";
+    $pdostmt2 = $pdo->prepare($query2);
+    $pdostmt2->execute(["user"=>$_POST["username_register"]]);
+    $result2 = $pdostmt2->fetch(PDO::FETCH_ASSOC);
+
+    if(!$result2){
+        $query1="select email from user where email=:mail";
+        $pdostmt1 = $pdo->prepare($query1);
+        $pdostmt1->execute(["mail"=>$_POST["email_register"]]);
+        $result1 = $pdostmt1->fetch(PDO::FETCH_ASSOC);
+    
+        if(!$result1){
+            $query = "insert into user(username,email,password) values(:user, :email, :pass)";
+            $pdostmt = $pdo->prepare($query);
+            $result = $pdostmt->execute(["user"=>$_POST["username_register"], "email"=>$_POST["email_register"],"pass"=>password_hash($_POST["password_register"],PASSWORD_DEFAULT)]);
+    
+            $msg = "ajout avec succes !";
+    
+            if($result){
+                $response=[
+                    "msg" => $msg,
+                    "value" => true
+                ];
+            }else{
+                $response=[
+                    "msg" => $pdostmt->errorInfo(),
+                    "value" => false
+                ];
+            }
+        }else {
+            $msg = "email exist deja";
+            $response=[
+                "email" => $msg
+            ];
+        }    
+    }else {
+        $msg = "username exist deja";
+            $response=[
+                "user" => $msg
+            ];
+    }
+
+
+    echo json_encode($response);
+
+}
+
+if(!empty($_POST["username_login"]) && !empty($_POST["password_login"])){
+
+    $query = "select * from user where username=:user";
+    $pdostmt = $pdo->prepare($query);
+    $pdostmt->execute(["user" => $_POST["username_login"]]);
+    $result = $pdostmt->fetch(PDO::FETCH_ASSOC);
+
+    $pass = password_verify($_POST["password_login"],$result["password"]);
+
+    if($result) {
+        if($pass){
+            $msg = "authentification avec succes !";
+
+            $response=[
+                "user" => $msg,
+                "value" => true
+            ];
+            $_SESSION["user"]=$result["username"];
+            header('Location:index.php');
+        }else{
+            $msg = "mot de pass eronne !";
+
+            $response=[
+                "mdp" => $msg,
+                "value" => false
+            ];
+        }
+
+    }else {
+        $response=[
+            "user" => "ce user n'existe pas",
+
+            "value" => false
+        ];
+    }
+
+    echo json_encode($response);
+}
 
 ?>
 
